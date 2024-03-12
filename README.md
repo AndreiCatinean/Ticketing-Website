@@ -1,1 +1,2 @@
 # Ticketing-Website
+This repository hosts the source code for a modern ticketing website developed using the Spring framework, CSS, and JavaScript. The ticketing website provides a comprehensive platform for users to browse, purchase, and manage tickets for various events and attractions. Users can visualize the seating layout of event venues through an interactive seat map feature. This allows users to select their preferred seats or sections directly on the map, providing a convenient and intuitive way to choose seating options during the ticket purchasing process.
