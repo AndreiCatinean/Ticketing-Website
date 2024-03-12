@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="">
+<head>
+    <meta charset="UTF-8">
+    <title>Ticketopia - Upcoming Events</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f9f9f9;
+            margin: 0;
+            padding: 0;
+        }
+        .header {
+            background-color: #007bff;
+            color: white;
+            text-align: center;
+            padding: 10px 0;
+            position: relative;
+        }
+        .logo {
+            position: absolute;
+            top: 10px;
+            left: 20px;
+            height: 80px;
+            margin: 10px;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            transition: transform 0.3s ease;
+        }
+        .logo:hover {
+            transform: scale(1.05);
+        }
+        .login-button {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            padding: 8px 15px;
+            background-color: #ff4757;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+            transition: background-color 0.3s ease;
+        }
+        .login-button:hover {
+            background-color: #e04040;
+        }
+
+        .floating-message button {
+            border: 2px solid white;
+            background-color: transparent;
+            color: white;
+            cursor: pointer;
+            border-radius: 50%;
+            padding: 5px 8px;
+            font-size: 14px;
+            line-height: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .container {
+            width: 95%;
+            margin: 20px auto;
+        }
+        .events {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-around;
+        }
+        .event-card {
+            width: 250px;
+            height: 500px;
+            background-color: white;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            padding: 20px;
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            margin-bottom: 20px;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+
+        }
+        .event-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.25);
+        }
+        .event-card img {
+            width: 100%;
+            height: 250px;
+            object-fit: cover;
+            border-radius: 5px;
+            margin-bottom: 15px;
+        }
+        .event-card h2 {
+            color: #333;
+            margin-top: 0;
+            font-size: 18px;
+            font-weight: bold;
+        }
+        .event-card p {
+            color: #666;
+            font-size: 14px;
+            flex-grow: 1;
+        }
+        .event-card span {
+            display: block;
+            color: #007bff;
+            margin-bottom: 5px;
+            font-size: 12px;
+        }
+        .event-card button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            margin: 4px 2px;
+            cursor: pointer;
+            border-radius: 5px;
+            align-self: center;
+
+        }
+
+        .account-dropdown {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            display: none;
+            width: auto;
+        }
+
+        .account-button {
+            width: 150px;
+            background-color: #228B22;
+            color: white;
+            padding: 8px 15px;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+            font-size: 16px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+            transition: background-color 0.3s ease;
+        }
+
+        .account-button:hover {
+            background-color: #0056b3;
+        }
+
+        .account-dropdown-content {
+            display: none;
+            position: absolute;
+            background-color: #f1f1f1;
+            min-width: 150px;
+            box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+            z-index: 1;
+            width: 100%;
+            color: black;
+        }
+
+        #userLastName {
+            padding: 10px;
+            text-align: center;
+            background-color: #f1f1f1;
+            border-bottom: 1px solid #ddd;
+            color: black;
+        }
+
+        .account-dropdown-content a {
+            color: black;
+            padding: 12px 16px;
+            text-decoration: none;
+            display: block;
+        }
+
+        .account-dropdown-content a:hover {
+            background-color: #ddd;
+        }
+
+        .account-dropdown:hover .account-dropdown-content {
+            display: block;
+        }
+
+
+
+
+        .user-info {
+            padding: 10px;
+            text-align: center;
+            background-color: #f1f1f1;
+            border-bottom: 1px solid #ddd;
+        }
+
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.4);
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            margin: 10% auto;
+            padding: 40px;
+            border: 1px solid #888;
+            width: 50%;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .modal h2 {
+            color: #333;
+            font-size: 24px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+
+        .login-form input[type="text"],
+        .login-form input[type="password"],
+        .register-form input[type="text"],
+        .register-form input[type="email"],
+        .register-form input[type="password"],
+        .register-form input[type="tel"] {
+            display: block;
+            width: 80%;
+            margin: 10px auto;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        .login-form button,
+        .register-form button {
+            width: 80%;
+            padding: 12px;
+            margin: 15px auto;
+            display: block;
+            font-size: 18px;
+            border-radius: 5px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+
+
+        .register-form
+        {
+            text-align: center;
+        }
+        .login-form
+        {
+            text-align: center;
+        }
+
+        .register-section a,
+        .login-section a {
+            color: #007bff;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        .events-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .filter-container {
+            margin-right: 20px;
+        }
+        .custom-select {
+            display: block;
+            width: 130%;
+            padding: 10px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            background-color: #fff;
+            background-image: linear-gradient(45deg, transparent 50%, #007bff 50%),
+            linear-gradient(135deg, #007bff 50%, transparent 50%);
+            background-position: calc(100% - 20px) calc(1em + 2px), calc(100% - 15px) calc(1em + 2px);
+            background-size: 5px 5px, 5px 5px;
+            background-repeat: no-repeat;
+            appearance: none;
+        }
+
+
+        .custom-select option:checked {
+            background-color: #007bff;
+            color: #fff;
+        }
+
+
+        .custom-select:hover {
+            background-color: #f5f5f5;
+            border: 1px solid #aaa;
+        }
+
+
+        .custom-select:focus {
+            border-color: #007bff;
+            box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.3);
+            outline: none;
+        }
+    </style>
+</head>
+<body>
+<div class="header">
+    <img src="/ticketopia_logo.png" alt="Ticketopia Logo" class="logo"/>
+    <button class="login-button" style="display:none;" onclick="openModal()">Login</button>
+    <div class="account-dropdown" style="display:none;">
+        <button class="account-button">My Account</button>
+        <div class="account-dropdown-content">
+            <div id="userLastName" class="user-info"></div>
+            <a href="/my-tickets" style="color: blue;">My Tickets</a>
+            <a href="#" onclick="logoutUser()">Disconnect</a>
+        </div>
+    </div>
+
+    <h1>Welcome to Ticketopia</h1>
+    <p>Discover and Book Tickets for Your Favorite Events</p>
+</div>
+<div id="loginModal" class="modal">
+    <div class="modal-content">
+        <span class="close" onclick="closeModal()">&times;</span>
+        <h2>Login to Your Account</h2>
+        <div class="login-form">
+        <form id="loginForm">
+
+
+                <input type="text" placeholder="Email" name="email" required>
+                <input type="password" placeholder="Password" name="password" required>
+
+
+                <button type="submit">Login</button>
+        </form>
+                <div class="register-section">
+                    <p>Don't have an account? <a href="#" onclick="openRegisterModal()">Register here</a></p>
+                </div>
+                <div id="loginError" style="display:none; color: red;"> </div>
+        </div>
+    </div>
+</div>
+
+
+<div id="registerModal" class="modal">
+    <div class="modal-content">
+        <span class="close" onclick="closeRegisterModal()">&times;</span>
+        <h2>Register an Account</h2>
+        <div class="register-form">
+            <form id="registrationForm" th:action="@{/register}" th:object="${user}" method="post">
+                <input type="text" name="firstName" placeholder="First Name" required>
+                <input type="text" name="lastName" placeholder="Last Name" required>
+                <input type="email" name="email" placeholder="Email" required>
+                <input type="password" name="password" placeholder="Password" required>
+                <input type="tel" name="phoneNumber" placeholder="Phone Number" required>
+                <button type="submit">Register</button>
+            </form>
+            <div class="login-section">
+                <p>Already have an account? <a href="#" onclick="closeRegisterModal(); openModal()">Login here</a></p>
+            </div>
+            <div id="registerError" style="display:none; color: red;"></div>
+        </div>
+    </div>
+</div>
+<div id="registerSuccess" style="display: none; color: green; text-align: center; padding: 10px; background-color: #4CAF50; border-radius: 5px; margin-top: 10px;">
+    <p style="margin: 0; font-size: 16px;">Registration Successful!</p>
+</div>
+
+<div class="container">
+    <div class="events-header">
+        <h2>Upcoming Events</h2>
+        <div class="filter-container">
+            <select id="event-category-select" onchange="filterEvents()" class="custom-select">
+                <option value="All" th:selected="${selectedCategory == 'All' }">All</option>
+                <option value="Rock" th:selected="${selectedCategory == 'Rock'}">Rock</option>
+                <option value="Blues" th:selected="${selectedCategory == 'Blues'}">Blues</option>
+                <option value="Theater" th:selected="${selectedCategory == 'Theater'}">Theater</option>
+                <option value="Comedy" th:selected="${selectedCategory == 'Comedy'}">Comedy</option>
+                <option value="Pop" th:selected="${selectedCategory == 'Pop'}">Pop</option>
+            </select>
+        </div>
+    </div>
+    <div class="events">
+        <div th:each="event : ${events}" class="event-card">
+            <img th:src="@{${event.photoUrl}}" alt="Event Image"/>
+            <h2 th:text="${event.eventName}">Event Name</h2>
+            <p th:text="${event.description}">Event Description</p>
+            <span th:text="${#dates.format(event.dateTime, 'dd MMMM yyyy HH:mm')}">Event Date and Time</span>
+            <span th:text="'Location: ' + ${event.location}">Event Location</span>
+            <button th:onclick="'window.location.href=\'/event-details/' + ${event.eventId} + '\''">Find More</button>
+        </div>
+    </div>
+</div>
+<script>
+    function openModal() {
+        document.getElementById("loginModal").style.display = "block";
+
+
+        document.getElementById("loginModal").querySelectorAll('input').forEach(input => input.value = '');
+
+
+        var loginErrorElement = document.getElementById('loginError');
+        if (loginErrorElement) {
+            loginErrorElement.textContent = '';
+            loginErrorElement.style.display = 'none';
+        }
+    }
+
+    function closeModal() {
+        document.getElementById("loginModal").style.display = "none";
+    }
+
+    function openRegisterModal() {
+        closeModal();
+        document.getElementById("registerModal").style.display = "block";
+
+
+        document.getElementById("registrationForm").reset();
+
+
+        var errorElement = document.getElementById('registerError');
+        errorElement.textContent = '';
+        errorElement.style.display = 'none';
+
+
+        var successElement = document.getElementById('registerSuccess');
+        if (successElement) {
+            successElement.style.display = 'none';
+        }
+    }
+
+    function closeRegisterModal() {
+        document.getElementById("registerModal").style.display = "none";
+    }
+
+    document.getElementById('loginForm').addEventListener('submit', function(event) {
+        event.preventDefault();
+
+        var formData = new FormData(this);
+
+        fetch('/login', {
+            method: 'POST',
+            body: formData
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    displaySuccessMessage(data.message);
+                    this.reset();
+                    setTimeout(closeModal, 300);
+                    checkSession();
+                } else {
+                    displayLoginErrorMessage(data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                displayLoginErrorMessage("An error occurred. Please try again.");
+            });
+    });
+
+    function displayLoginErrorMessage(message) {
+        var errorElement = document.getElementById('loginError');
+        errorElement.textContent = message;
+        errorElement.style.display = 'block';
+    }
+
+
+    document.getElementById('registrationForm').addEventListener('submit', function(event) {
+        event.preventDefault();
+
+        var formData = new FormData(this);
+
+        fetch(this.action, {
+            method: 'POST',
+            body: formData
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+
+                    displaySuccessMessage(data.message);
+                    this.reset();
+
+                    setTimeout(closeRegisterModal, 300);
+                } else {
+
+                    displayErrorMessage(data.message);
+                }
+            })
+            .catch(error => console.error('Error:', error));
+    });
+
+    function displayErrorMessage(message) {
+        var errorElement = document.getElementById('registerError');
+        errorElement.textContent = message;
+        errorElement.style.display = 'block';
+    }
+
+    function displaySuccessMessage(message) {
+        var successElement = document.getElementById('registerSuccess');
+        successElement.textContent = message;
+        successElement.style.display = 'block';
+
+        setTimeout(() => { successElement.style.display = 'none'; }, 3000);
+    }
+
+
+    function checkSession() {
+        fetch('/sessionStatus')
+            .then(response => response.json())
+            .then(data => {
+                console.log(data);
+                if (data.isLoggedIn) {
+                    document.querySelector('.login-button').style.display = 'none';
+                    document.querySelector('.account-dropdown').style.display = 'block';
+                    document.getElementById('userLastName').textContent = 'Hello, ' + data.user.lastName;
+                } else {
+                    document.querySelector('.login-button').style.display = 'block';
+                    document.querySelector('.account-dropdown').style.display = 'none';
+                }
+            })
+            .catch(error => console.error('Error:', error));
+    }
+    function filterEvents() {
+        var selectedCategory = document.getElementById('event-category-select').value;
+        window.location.href = '/?category=' + selectedCategory;
+    }
+    function logoutUser() {
+        fetch('/logout')
+            .then(() => {
+                checkSession();
+            });
+    }
+
+    window.onload = function() {
+        checkSession();
+
+
+        if (localStorage.getItem('orderCompleted') === 'true') {
+            displaySuccessMessage("Order completed");
+            localStorage.removeItem('orderCompleted');
+        }
+    };
+
+
+</script>
+</body>
+</html>

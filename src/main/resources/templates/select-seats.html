@@ -1,0 +1,402 @@
+<!-- select-seats.html -->
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f9f9f9;
+            margin: 0;
+            padding: 0;
+        }
+
+        .account-dropdown {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            display: block;
+            width: auto;
+        }
+
+        .account-button {
+            width: 150px;
+            background-color: #228B22;
+            color: white;
+            padding: 8px 15px;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+            font-size: 16px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+            transition: background-color 0.3s ease;
+        }
+
+        .account-button:hover {
+            background-color: #0056b3;
+        }
+
+        .account-dropdown-content {
+            display: none;
+            position: absolute;
+            background-color: #f1f1f1;
+            min-width: 150px;
+            box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+            z-index: 1;
+            width: 100%;
+            color: black;
+        }
+
+        #userLastName {
+            padding: 10px;
+            text-align: center;
+            background-color: #f1f1f1;
+            border-bottom: 1px solid #ddd;
+            color: black;
+        }
+
+        .account-dropdown-content a {
+            color: black;
+            padding: 12px 16px;
+            text-decoration: none;
+            display: block;
+        }
+
+        .account-dropdown-content a:hover {
+            background-color: #ddd;
+        }
+
+        .account-dropdown:hover .account-dropdown-content {
+            display: block;
+        }
+
+
+        .user-info {
+            padding: 10px;
+            text-align: center;
+            background-color: #f1f1f1;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .header {
+            background-color: #007bff;
+            color: white;
+            text-align: center;
+            padding: 10px 0;
+            position: relative;
+        }
+
+        .logo {
+            position: absolute;
+            top: 10px;
+            left: 20px;
+            height: 80px;
+            margin: 10px;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s ease;
+        }
+
+        .logo:hover {
+            transform: scale(1.05);
+        }
+
+
+        .floating-message button {
+            border: 2px solid white;
+            background-color: transparent;
+            color: white;
+            cursor: pointer;
+            border-radius: 50%;
+            padding: 5px 8px;
+            font-size: 14px;
+            line-height: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .seat-selection-container {
+            display: flex;
+            justify-content: space-between;
+            padding: 20px;
+        }
+
+        .hall-map {
+            flex-grow: 2;
+        }
+
+        .row {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 10px;
+        }
+
+        .seat {
+            width: 30px;
+            height: 30px;
+            margin: 5px;
+            border: none;
+            border-radius: 5px;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .occupied {
+            background-color: #555;
+            cursor: not-allowed;
+        }
+
+        .available {
+            background-color: #4CAF50;
+        }
+
+        .selected {
+            background-color: #4285F4;
+        }
+
+        .screen {
+            background-color: #dddddd;
+            text-align: center;
+            padding: 5px;
+            margin-bottom: 20px;
+        }
+
+        .booking-details {
+            height: auto;
+            width: 30%;
+            display: flex;
+            flex-direction: column;
+            margin-left: 10px;
+            background: #f3f3f3;
+            padding: 20px;
+            border-radius: 5px;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .booking-details h2 {
+            margin-bottom: 20px;
+        }
+
+        .booking-summary {
+            margin-top: auto;
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+            align-items: center;
+            gap: 10px;
+        }
+
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+        }
+
+        .legend-item span {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            margin-right: 5px;
+        }
+
+        .checkout-button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            margin-bottom: 10px;
+            margin-top: 15px;
+        }
+
+        .legend {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 20px;
+        }
+
+        .booking-details h2 {
+            text-align: center;
+        }
+
+
+        .legend-item .free {
+            background-color: #388e3c;
+            border: 1px solid #fff;
+        }
+
+    </style>
+    <title>Select Seats</title>
+</head>
+<body>
+<div class="header">
+    <a href="/">
+        <img src="/ticketopia_logo.png" alt="Ticketopia Logo" class="logo"/>
+    </a>
+
+    <div class="account-dropdown" style="display:block;">
+        <button class="account-button">My Account</button>
+        <div class="account-dropdown-content">
+            <div id="userLastName" class="user-info"></div>
+
+            <a href="#" onclick="logoutUser()">Disconnect</a>
+        </div>
+    </div>
+
+    <h1>Welcome to Ticketopia</h1>
+    <p>Discover and Book Tickets for Your Favorite Events</p>
+</div>
+<div class="seat-selection-container">
+    <div class="hall-map">
+        <div class="screen">Front</div>
+        <div th:each="row : ${rows}" class="row">
+            <button th:each="seat : ${row.seats}"
+                    th:id="${'seat-' + seat.seatNumber}"
+                    class="seat"
+                    th:classappend="${seat.status == 'Occupied' ? ' occupied' : ' available'}"
+                    th:text="${seat.seatNumber}"
+                    th:disabled="${seat.status == 'Occupied'}"
+                    th:attr="data-price=${seat.price}, data-seat-id=${seat.seatNumber}"
+                    onclick="selectSeat(this)">
+            </button>
+        </div>
+    </div>
+
+    <div class="booking-details">
+        <h2 th:text="${event.eventName}">Event Title</h2>
+
+        <h3>Selected Seats</h3>
+        <ul id="selected-seats-list"></ul>
+
+        <div class="booking-summary">
+
+            <div>Total Price: $<span id="total-price">0</span></div>
+            <button onclick="confirmOrder()" class="checkout-button">Checkout »</button>
+            <div class="legend">
+                <div class="legend-item"><span class="seat free"></span> Free seat</div>
+                <div class="legend-item"><span class="seat occupied"></span> Already Booked</div>
+                <div class="legend-item"><span class="seat selected"></span> Selected</div>
+            </div>
+        </div>
+    </div>
+
+
+</div>
+</div>
+
+
+<script th:inline="javascript">
+    /*<![CDATA[*/
+    var selectedSeats = [];
+
+    function selectSeat(seatButton) {
+        console.log("Seat clicked: ", seatButton.dataset.seatId);
+
+        var seatId = seatButton.dataset.seatId;
+
+        seatButton.classList.toggle('selected');
+
+        if (selectedSeats.includes(seatId)) {
+            selectedSeats = selectedSeats.filter(id => id !== seatId);
+        } else {
+            selectedSeats.push(seatId);
+        }
+        var seatPrice = parseFloat(seatButton.dataset.price);
+        updateTotalPrice(seatPrice, seatButton.classList.contains('selected'));
+
+        updateSelectedSeatsList();
+    }
+
+    function updateTotalPrice(seatPrice, isSelected) {
+        var totalPriceElement = document.getElementById('total-price');
+        var currentTotal = parseFloat(totalPriceElement.textContent);
+
+        if (isSelected) {
+            currentTotal += seatPrice;
+        } else {
+            currentTotal -= seatPrice;
+        }
+
+        totalPriceElement.textContent = currentTotal.toFixed(2);
+    }
+
+    function updateSelectedSeatsList() {
+        var list = document.getElementById('selected-seats-list');
+        list.innerHTML = '';
+        selectedSeats.forEach(function (seatId) {
+            var li = document.createElement('li');
+            li.textContent = 'Seat ID: ' + seatId;
+            list.appendChild(li);
+        });
+    }
+
+    function checkSession() {
+        fetch('/sessionStatus')
+            .then(response => response.json())
+            .then(data => {
+                console.log(data);
+                if (!data.isLoggedIn) {
+                    window.location.href = '/';
+                } else {
+                    document.getElementById('userLastName').textContent = 'Hello, ' + data.user.lastName;
+                }
+            })
+            .catch(error => console.error('Error:', error));
+    }
+
+    function logoutUser() {
+        fetch('/logout')
+            .then(() => {
+                checkSession();
+            });
+    }
+
+    window.onload = function () {
+        checkSession();
+    };
+
+    function confirmOrder() {
+        if (selectedSeats.length === 0) {
+            alert('Please select at least one seat.');
+            return;
+        }
+        var total = parseFloat(document.getElementById('total-price').textContent);
+
+        fetch('/confirmOrder', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                eventId: [[${event.eventId}]],
+                seatIds: selectedSeats,
+            })
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    localStorage.setItem('orderCompleted', 'true');
+                    window.location.href = '/';
+
+                } else {
+                    alert('There was an issue with your booking. Please try again.');
+                    location.reload();
+
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred while confirming your order.');
+            });
+    }
+
+    /*]]>*/
+</script>
+
+
+</body>
+</html>

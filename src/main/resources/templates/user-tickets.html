@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="">
+<head>
+    <meta charset="UTF-8">
+    <title>Your Tickets - Ticketopia</title>
+    <style>
+        .account-dropdown {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            display: block;
+            width: auto;
+        }
+
+        .account-button {
+            width: 150px;
+            background-color: #228B22;
+            color: white;
+            padding: 8px 15px;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+            font-size: 16px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+            transition: background-color 0.3s ease;
+        }
+
+        .account-button:hover {
+            background-color: #0056b3;
+        }
+
+        .account-dropdown-content {
+            display: none;
+            position: absolute;
+            background-color: #f1f1f1;
+            min-width: 150px;
+            box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+            z-index: 1;
+            width: 100%;
+            color: black;
+        }
+
+        #userLastName {
+            padding: 10px;
+            text-align: center;
+            background-color: #f1f1f1;
+            border-bottom: 1px solid #ddd;
+            color: black;
+        }
+
+        .account-dropdown-content a {
+            color: black;
+            padding: 12px 16px;
+            text-decoration: none;
+            display: block;
+        }
+
+        .account-dropdown-content a:hover {
+            background-color: #ddd;
+        }
+
+        .account-dropdown:hover .account-dropdown-content {
+            display: block;
+        }
+
+
+        .user-info {
+            padding: 10px;
+            text-align: center;
+            background-color: #f1f1f1;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .header {
+            background-color: #007bff;
+            color: white;
+            text-align: center;
+            padding: 10px 0;
+            position: relative;
+        }
+        .logo {
+            position: absolute;
+            top: 10px;
+            left: 20px;
+            height: 80px;
+            margin: 10px;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            transition: transform 0.3s ease;
+        }
+        .logo:hover {
+            transform: scale(1.05);
+        }
+
+
+        .floating-message button {
+            border: 2px solid white;
+            background-color: transparent;
+            color: white;
+            cursor: pointer;
+            border-radius: 50%;
+            padding: 5px 8px;
+            font-size: 14px;
+            line-height: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f9f9f9;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            width: 80%;
+            margin: 20px auto;
+            padding: 20px;
+            background: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .ticket-card {
+            transition: box-shadow 0.3s ease, transform 0.3s ease;
+
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border: 1px solid #ddd;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+        }
+        .ticket-card:hover {
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            transform: translateY(-5px);
+        }
+        .ticket-details {
+            flex-grow: 1;
+        }
+        .ticket-card h3 {
+            margin-top: 0;
+            color: #007bff;
+        }
+        .ticket-info {
+            color: #555;
+        }
+        .event-image {
+            width: 150px;
+            height: 150px;
+            object-fit: cover;
+            border-radius: 50%;
+            margin-left: 15px;
+            margin-right: 20px;
+        }
+        .download-button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 8px 12px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+<div class="header">
+    <a href="/">
+        <img src="/ticketopia_logo.png" alt="Ticketopia Logo" class="logo"/>
+    </a>
+
+    <div class="account-dropdown" style="display:block;">
+        <button class="account-button">My Account</button>
+        <div class="account-dropdown-content">
+            <div id="userLastName" class="user-info"></div>
+
+            <a href="#" onclick="logoutUser()">Disconnect</a>
+        </div>
+    </div>
+
+    <h1>Welcome to Ticketopia</h1>
+    <p>Discover and Book Tickets for Your Favorite Events</p>
+</div>
+
+<div class="container">
+    <h2>Your Tickets</h2>
+    <div th:if="${tickets.isEmpty()}">
+        <p>You have no tickets ordered.</p>
+    </div>
+    <div th:if="${!tickets.isEmpty()}">
+        <div th:each="ticket : ${tickets}" class="ticket-card">
+            <div class="ticket-details">
+                <h3 th:text="${ticket.event.eventName}">Event Name</h3>
+                <p class="ticket-info" th:text="'Date: ' + ${#dates.format(ticket.event.dateTime, 'dd MMMM yyyy HH:mm')}">Event Date and Time</p>
+                <p class="ticket-info" th:text="'Location: ' + ${ticket.event.location}">Event Location</p>
+                <p class="ticket-info" th:text="'Seat Number: ' + ${ticket.seatNumber}">Seat Number</p>
+                <p class="ticket-info" th:text="'Price: $' + ${ticket.payment}">Price</p>
+            </div>
+            <img th:src="@{${ticket.event.photoUrl}}" alt="Event Image" class="event-image"/>
+            <a href="#" class="download-button">Download</a>
+        </div>
+    </div>
+</div>
+
+<script>
+    function checkSession() {
+        fetch('/sessionStatus')
+            .then(response => response.json())
+            .then(data => {
+                console.log(data);
+                if (!data.isLoggedIn) {
+                    window.location.href = '/';
+                }
+                else
+                {
+                    document.getElementById('userLastName').textContent = 'Hello, ' + data.user.lastName;
+                }
+            })
+            .catch(error => console.error('Error:', error));
+    }
+
+    function logoutUser() {
+        fetch('/logout')
+            .then(() => {
+                checkSession();
+            });
+    }
+    window.onload = function() {
+        checkSession();
+    };
+
+</script>
+</body>
+</html>
